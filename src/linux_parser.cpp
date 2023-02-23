@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "linux_parser.h"
 
@@ -10,6 +11,7 @@ using std::stof;
 using std::string;
 using std::to_string;
 using std::vector;
+using std::unordered_map;
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
@@ -67,11 +69,49 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+// Read and return the system memory utilization
+unordered_map& LinuxParser::MemoryUtilization() { 
+  // Memory utilization to be calculated as total memory as a dict of memory, non-cache/buffer memory, buffers, cached memory, swap
+  unordered_map<string, int> memory_data;
+  string line, token;
+  int memory_total
 
-// TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+  std::ifstream stream(kProcDirectory + kStatFilename);
+    if (stream.is_open()) {
+      while (std::getline(stream, line)) {
+        // Grab the token from the start of the line, then use it win our dict to assign the value (from istream_iterator since only one int) to the key. 
+        std::istringstream linestream(line);
+        linestream >> token;
+        memory_data[token] = std::istream_iterator<int>(linestream);
+      }
+    }
+
+  // Define dict and dict values
+  unordered_map parsed_mem_data;
+  string total_usage, non_cache_buffer, buffer, cache, swap;
+
+  parsed_mem_data["total_usage"] = memory_data["MemTotal"] - memory_data["MemFree"];
+  parsed_mem_data["non_cache_buffer"] = parsed_mem_data["total_usage"] - memory_data["Buffers"] + memory_data["Cached"];
+  parsed_mem_data["buffers"] = memory_data["Buffers"];
+  parsed_mem_data["cached"] = memory_data["Cached"] + memory_data["Sreclaimable"] - memory_data["Shmem"];
+  parsed_mem_data["swap"] = memory_data["SwapTotal"] - memory_data["SwapFree"];
+
+  return (&parsed_mem_data); 
+}
+
+// Read and return the system uptime
+long LinuxParser::UpTime() { 
+  long uptime;
+  string line;
+  std::ifstream stream(kProcDirectory + kUptimeFilename);
+
+  // Since file only contains 2 numbers in a single line, stream it a single time and assign first value to uptime
+  std::getline(stream, line) 
+  std::istringstream linestream(line);
+  linestream >> uptime;
+
+  return uptime; 
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
