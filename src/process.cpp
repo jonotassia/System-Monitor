@@ -18,7 +18,7 @@ int Process::Pid() {
 
 // Return this process's CPU utilization
 float Process::CpuUtilization() { 
-    hertz = std::sysconf(_SC_CLK_TCK);
+    hertz = sysconf(_SC_CLK_TCK);
     return 100 * (LinuxParser::ActiveJiffies(this->pid)/hertz) / this->UpTime(); 
 }
 

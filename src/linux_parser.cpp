@@ -72,24 +72,23 @@ vector<int> LinuxParser::Pids() {
 
 // Read and return a vector of processor
 vector<Processor> LinuxParser::Processors() {
-  vector<Processors> processors;
+  vector<Processor> processors;
   int proc_count = -1;
   string line, token;
 
-  std::ifstream stream(kProcDirectory + kStatFilename) {
-    if (stream.is_open()) {
-      while (std::getline(stream, line)) {
-        // Get the each token
-        std::istringstream linestream(line);
-        linestream >> token;
+  std::ifstream stream(kProcDirectory + kStatFilename);
+  if (stream.is_open()) {
+    while (std::getline(stream, line)) {
+      // Get the each token
+      std::istringstream linestream(line);
+      linestream >> token;
 
-        // Increment proc_count by 1 for each loop, starting at -1 in order to avoid pulling in the aggregate cpu
-        proc_count++;
+      // Increment proc_count by 1 for each loop, starting at -1 in order to avoid pulling in the aggregate cpu
+      proc_count++;
 
-        // Break once the CPU section has been passed
-        if (token == "intr") {
-          break;
-        }
+      // Break once the CPU section has been passed
+      if (token == "intr") {
+        break;
       }
     }
   }
@@ -102,7 +101,7 @@ vector<Processor> LinuxParser::Processors() {
 }
 
 // Read and return the system memory data as a dictionary for further processing
-unordered_map& LinuxParser::MemoryData() { 
+unordered_map<string, int>& LinuxParser::MemoryData() { 
   // Memory utilization to be calculated as total memory as a dict of memory, non-cache/buffer memory, buffers, cached memory, swap
   unordered_map<string, int> memory_data;
   string line, token;
@@ -129,7 +128,7 @@ unordered_map& LinuxParser::MemoryData() {
   parsed_mem_data["cached"] = memory_data["Cached"] + memory_data["Sreclaimable"] - memory_data["Shmem"];
   parsed_mem_data["swap"] = memory_data["SwapTotal"] - memory_data["SwapFree"];
 
-  return (&parsed_mem_data); 
+  return *parsed_mem_data; 
 }
 
 // Read and return the system memory utilization
@@ -166,16 +165,11 @@ long LinuxParser::UpTime() {
 
   // Since file only contains 2 numbers in a single line, stream it a single time and assign first value to uptime
   if (stream.is_open()) {
-    std::getline(stream, line) 
+    std::getline(stream, line); 
     std::istringstream linestream(line);
     linestream >> uptime;
   }
   return uptime; 
-}
-
-// Read and return the number of jiffies for each processor
-long LinuxParser::Jiffies(int cpu_number) { 
-  return ActiveJiffies(cpu_number) + IdleJiffies(cpu_number); 
 }
 
 // Read and return the number of active jiffies for a PID
@@ -214,7 +208,7 @@ long LinuxParser::ActiveJiffies(int cpu_number) {
 
         // Stream the cpu_number and attach to cpu string to check for equality, then return a vector of relevant cpu jiffy data
         std::ostringstream oss;
-        if (token == oss << "cpu" << (string)cpu_number) {
+        if (token == oss << "cpu" << std::to_string(cpu_number)) {
           copy(std::istring_iterator<long>(linestream), std::istring_iterator(), std::back_insertor(jiffies));
           break;
         }
@@ -241,7 +235,7 @@ long LinuxParser::IdleJiffies(int cpu_number) {
 
         // Stream the cpu_number and attach to cpu string to check for equality, then return a vector of relevant cpu jiffy data
         std::ostringstream oss;
-        if (token == oss << "cpu" << (string)cpu_number) {
+        if (token == oss << "cpu" << std::to_string(cpu_number)) {
           copy(std::istring_iterator<long>(linestream), std::istring_iterator(), std::back_insertor(jiffies));
           break;
         }
@@ -251,6 +245,11 @@ long LinuxParser::IdleJiffies(int cpu_number) {
   // Sum up the relevant jiffies for total idle number: idle + iowait
   idle_jiffies = jiffies[3] + jiffies[4];
   return idle_jiffies;  
+}
+
+// Read and return the number of jiffies for each processor
+long LinuxParser::Jiffies(int cpu_number) { 
+  return ActiveJiffies(cpu_number) + IdleJiffies(cpu_number); 
 }
 
 // Read and return CPU utilization
@@ -267,7 +266,7 @@ int LinuxParser::TotalProcesses() {
   string token;
   int processes;
   
-  ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(kProcDirectory + kStatFilename);
   
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
@@ -288,7 +287,7 @@ int LinuxParser::RunningProcesses() {
   string token;
   int proc_running;
   
-  ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(kProcDirectory + kStatFilename);
   while (std::getline(stream, line)) {
     std::istringstream linestream(line);
     linestream >> token >> proc_running;
@@ -305,9 +304,12 @@ string LinuxParser::Command(int pid) {
   string command;
 
   std::ifstream stream(kProcDirectory + std::to_string(pid) + "/" + kCmdlineFilename);
-  std::istringstream linestream(line);
-  linestream >> command;
-  
+  if (stream.is_open()) {
+    while (std::getline(stream, line)) {
+      std::istringstream linestream(line);
+      linestream >> command;
+    }
+  }
   return command; 
 }
 
@@ -386,7 +388,7 @@ long LinuxParser::UpTime(int pid){
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
   long starttime = jiffies[22];
-  long hertz = std::sysconf(_SC_CLK_TCK);
+  long hertz = sysconf(_SC_CLK_TCK);
   int uptime = UpTime() - starttime / hertz;
 
   return uptime; 
