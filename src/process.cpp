@@ -18,23 +18,23 @@ int Process::Pid() {
 
 // Return this process's CPU utilization
 float Process::CpuUtilization() { 
-    hertz = sysconf(_SC_CLK_TCK);
+    long hertz = sysconf(_SC_CLK_TCK);
     return 100 * (LinuxParser::ActiveJiffies(this->pid)/hertz) / this->UpTime(); 
 }
 
 // Return the command that generated this process
 string Process::Command() { 
-    return LinuxParser::Command(this->pid); 
+    return LinuxParser::Command(this->Pid()); 
 }
 
 // TODO: Return this process's memory utilization
 string Process::Ram() { 
-    return LinuxParser::Ram(this->pid); 
+    return LinuxParser::Ram(this->Pid()); 
 }
 
 // TODO: Return the user (name) that generated this process
 string Process::User() { 
-    return LinuxParser::User(this->pid); 
+    return LinuxParser::User(this->Pid()); 
 }
 
 // Return the age of this process (in seconds)
@@ -44,9 +44,8 @@ long int Process::UpTime() {
 
 // Overload the "less than" comparison operator for Process objects
 bool Process::operator<(Process const& a) const { 
-    if (this->id < a->id) {
+    if (this->Pid() < a->Pid()) {
         return true; 
-    } else {
-        return false;
     }
+    return false;
 }
