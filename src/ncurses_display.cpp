@@ -28,21 +28,21 @@ std::string NCursesDisplay::ProgressBar(float percent) {
   return result + " " + display + "/100%";
 }
 
-//Create progress bar to handle memory data
-std::string NCursesDisplay::ProgressBar(float percent) {
-  std::string result{"0%"};
-  int size{50};
-  float bars{percent * size};
+// //Create progress bar to handle memory data
+// std::string NCursesDisplay::MemoryBar(float percent) {
+//   std::string result{"0%"};
+//   int size{50};
+//   float bars{percent * size};
 
-  for (int i{0}; i < size; ++i) {
-    result += i <= bars ? '|' : ' ';
-  }
+//   for (int i{0}; i < size; ++i) {
+//     result += i <= bars ? '|' : ' ';
+//   }
 
-  string display{to_string(percent * 100).substr(0, 4)};
-  if (percent < 0.1 || percent == 1.0)
-    display = " " + to_string(percent * 100).substr(0, 3);
-  return result + " " + display + "/100%";
-}
+//   string display{to_string(percent * 100).substr(0, 4)};
+//   if (percent < 0.1 || percent == 1.0)
+//     display = " " + to_string(percent * 100).substr(0, 3);
+//   return result + " " + display + "/100%";
+// }
 
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};
