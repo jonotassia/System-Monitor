@@ -15,7 +15,7 @@ using std::string;
 using std::vector;
 
 // Sets and return the system's CPU
-Processor& System::Cpu() { 
+vector<Processor&> System::Cpu() { 
     if (cpu_.size == 0) {
         int num_processors = LinuxParser::NumProcessors();
         vector<Processor> processors;
