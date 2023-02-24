@@ -96,7 +96,7 @@ int LinuxParser::NumProcessors() {
 }
 
 // Read and return the system memory data as a dictionary for further processing
-unordered_map<string, int>* LinuxParser::MemoryData() { 
+unordered_map<string, int>& LinuxParser::MemoryData() { 
   // Memory utilization to be calculated as total memory as a dict of memory, non-cache/buffer memory, buffers, cached memory, swap
   unordered_map<string, int> memory_data;
   string line, token;
@@ -124,37 +124,37 @@ unordered_map<string, int>* LinuxParser::MemoryData() {
   parsed_mem_data["cached"] = memory_data["Cached"] + memory_data["Sreclaimable"] - memory_data["Shmem"];
   parsed_mem_data["swap"] = memory_data["SwapTotal"] - memory_data["SwapFree"];
 
-  return *parsed_mem_data; 
+  return &(parsed_mem_data); 
 }
 
 // Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { 
   unordered_map mem_data = *MemoryData();
-  return 100* (mem_data["mem_total"] - mem_data["mem_free"]) / mem_data["mem_total"];
+  return 100 * (mem_data["mem_total"] - mem_data["mem_free"]) / mem_data["mem_total"];
 }
 
 // Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
 long LinuxParser::NonCacheBufferMem() {
-  unordered_map<string, int>* memory_data = MemoryData();
-  return *memory_data["non_cache_buffer"];
+  unordered_map<string, int> memory_data = *MemoryData();
+  return memory_data["non_cache_buffer"];
 }
 
 // Read and return buffer memory
 long LinuxParser::BufferMem() {
-  unordered_map<string, int>* memory_data = MemoryData();
-  return *memory_data["buffers"];
+  unordered_map<string, int> memory_data = *MemoryData();
+  return memory_data["buffers"];
 }
 
 // Read and return cached memory: Cached + SReclaimable - Shmem
 long LinuxParser::CachedMem() {
-  unordered_map<string, int>* memory_data = MemoryData();
-  return *memory_data["cached"];
+  unordered_map<string, int> memory_data = *MemoryData();
+  return memory_data["cached"];
 }
 
 // Read and return swap memory: SwapTotal - SwapFree
 long LinuxParser::SwapMem() {
-  unordered_map<string, int>* memory_data = MemoryData();
-  return *memory_data["swap"];
+  unordered_map<string, int> memory_data = *MemoryData();
+  return memory_data["swap"];
 }
 
 // Read and return the system uptime
