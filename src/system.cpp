@@ -18,14 +18,13 @@ using std::vector;
 vector<Processor>& System::Cpu() { 
     if (cpu_.size == 0) {
         int num_processors = LinuxParser::NumProcessors();
-        vector<Processor> processors;
+        vector<Processor>& processors;
 
         // Initialize and pushback processors
         for (int i = 1; i <= proc_count; i++) {
-            processors.push_back(Processor(i));
+            processors->push_back(Processor(i));
         }
     }
-
     return cpu_; 
 }
 
@@ -34,7 +33,6 @@ vector<Process>& System::Processes() {
     if (processes_.size() == 0) {
         processes_ = LinuxParser::Pids();
     }
-    
     return processes_; 
 }
 

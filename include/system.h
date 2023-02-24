@@ -10,7 +10,7 @@
 
 class System {
  public:
-  Processor& Cpu();                   
+  std::vector<Processor>& Cpu();                   
   std::vector<Process>& Processes();  
   float MemoryUtilization();          
   long UpTime();                      
