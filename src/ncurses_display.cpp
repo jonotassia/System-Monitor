@@ -28,6 +28,22 @@ std::string NCursesDisplay::ProgressBar(float percent) {
   return result + " " + display + "/100%";
 }
 
+//Create progress bar to handle memory data
+std::string NCursesDisplay::ProgressBar(float percent) {
+  std::string result{"0%"};
+  int size{50};
+  float bars{percent * size};
+
+  for (int i{0}; i < size; ++i) {
+    result += i <= bars ? '|' : ' ';
+  }
+
+  string display{to_string(percent * 100).substr(0, 4)};
+  if (percent < 0.1 || percent == 1.0)
+    display = " " + to_string(percent * 100).substr(0, 3);
+  return result + " " + display + "/100%";
+}
+
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};
   mvwprintw(window, ++row, 2, ("OS: " + system.OperatingSystem()).c_str());
@@ -35,8 +51,11 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, ++row, 2, "CPU: ");
   wattron(window, COLOR_PAIR(1));
   mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.Cpu().Utilization()).c_str());
-  wattroff(window, COLOR_PAIR(1));
+  // Loop through processors in system
+  for (auto proc : system.Cpu()) {
+    wprintw(window, ProgressBar(proc.Utilization()).c_str());
+    wattroff(window, COLOR_PAIR(1));
+  }
   mvwprintw(window, ++row, 2, "Memory: ");
   wattron(window, COLOR_PAIR(1));
   mvwprintw(window, row, 10, "");
