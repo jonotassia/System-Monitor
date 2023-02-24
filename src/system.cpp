@@ -14,13 +14,27 @@ using std::size_t;
 using std::string;
 using std::vector;
 
-// Return the system's CPU
+// Sets and return the system's CPU
 Processor& System::Cpu() { 
+    if (cpu_.size == 0) {
+        int num_processors = LinuxParser::NumProcessors();
+        vector<Processor> processors;
+
+        // Initialize and pushback processors
+        for (int i = 1; i <= proc_count; i++) {
+            processors.push_back(Processor(i));
+        }
+    }
+
     return cpu_; 
 }
 
 // Return a container composed of the system's processes
 vector<Process>& System::Processes() { 
+    if (processes_.size() == 0) {
+        processes_ = LinuxParser::Pids();
+    }
+    
     return processes_; 
 }
 

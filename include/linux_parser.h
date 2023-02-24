@@ -4,6 +4,7 @@
 #include <fstream>
 #include <regex>
 #include <string>
+#include <unordered_map>
 
 namespace LinuxParser {
 // Paths
@@ -19,9 +20,9 @@ const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
 
 // System
-vector<Processors> Processors();
+int NumProcessors();
 float MemoryUtilization();
-unordered_map& MemoryData();
+std::unordered_map& MemoryData();
 long NonCacheBufferMem();
 long BufferMem();
 long CachedMem();

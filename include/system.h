@@ -21,8 +21,8 @@ class System {
 
   // Define any necessary private members
  private:
-  vector<Processor> cpu_ = {LinuxParser::Processors()};
-  std::vector<Process> processes_ = {LinuxParser::Pids()};
+  vector<Processor> cpu_ = {};
+  vector<Process> processes_ = {};
 };
 
 #endif
