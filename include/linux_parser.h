@@ -20,6 +20,11 @@ const std::string kPasswordPath{"/etc/passwd"};
 
 // System
 float MemoryUtilization();
+unordered_map& MemoryData();
+long NonCacheBufferMem();
+long BufferMem();
+long CachedMem();
+long SwapMem();
 long UpTime();
 std::vector<int> Pids();
 int TotalProcesses();
@@ -40,7 +45,7 @@ enum CPUStates {
   kGuest_,
   kGuestNice_
 };
-std::vector<std::string> CpuUtilization();
+float CpuUtilization();
 long Jiffies();
 long ActiveJiffies();
 long ActiveJiffies(int pid);

@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <iterator>
 
 #include "process.h"
 #include "processor.h"
@@ -16,8 +17,15 @@ using std::vector;
 
 You need to properly format the uptime. Refer to the comments mentioned in format. cpp for formatting the uptime.*/
 
-// TODO: Return the system's CPU
-Processor& System::Cpu() { return cpu_; }
+// Create constructor that takes a vector of processors for machines with multiple processors
+System::System(vector<Processor> processors) {
+    copy(processors.begin(), processors.end(), std::back_inserter(this->cpu_));
+}
+
+// Return the system's CPU
+Processor& System::Cpu() { 
+    return cpu_; 
+}
 
 // TODO: Return a container composed of the system's processes
 vector<Process>& System::Processes() { return processes_; }
