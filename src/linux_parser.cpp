@@ -304,7 +304,7 @@ int LinuxParser::RunningProcesses() {
 string LinuxParser::Command(int pid) { 
   string command;
 
-  std::ifstream stream(kProcDirectory + pid + "/" + kCmdlineFilename);
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + "/" + kCmdlineFilename);
   std::istringstream linestream(line);
   linestream >> command;
   
@@ -316,7 +316,7 @@ string LinuxParser::Ram(int pid) {
   long ram;
   string token, line;
 
-  std::ifstream stream(kProcDirectory + pid + "/" + kStatusFilename);
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + "/" + kStatusFilename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
@@ -336,7 +336,7 @@ string LinuxParser::Uid(int pid) {
   string uid;
   string token, line;
 
-  std::ifstream stream(kProcDirectory + pid + "/" + kStatusFilename);
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + "/" + kStatusFilename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
@@ -377,7 +377,7 @@ long LinuxParser::UpTime(int pid){
   string line;
 
   // Gather data from proc/pid/stat file
-  std::ifstream stream(kProcDirectory + pid + "/" + kStatFilename);
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + "/" + kStatFilename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
@@ -386,7 +386,7 @@ long LinuxParser::UpTime(int pid){
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
   long starttime = jiffies[22];
-  long hertz = std::sysconf(__SC_CLK_TCK);
+  long hertz = std::sysconf(_SC_CLK_TCK);
   int uptime = UpTime() - starttime / hertz;
 
   return uptime; 
