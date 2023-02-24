@@ -135,22 +135,26 @@ float LinuxParser::MemoryUtilization() {
 
 // Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
 long LinuxParser::NonCacheBufferMem() {
-  return *MemoryData()["non_cache_buffer"];
+  unordered_map<string, int>* memory_data = MemoryData();
+  return *memory_data["non_cache_buffer"];
 }
 
 // Read and return buffer memory
 long LinuxParser::BufferMem() {
-  return *MemoryData()["buffers"];
+  unordered_map<string, int>* memory_data = MemoryData();
+  return *memory_data["buffers"];
 }
 
 // Read and return cached memory: Cached + SReclaimable - Shmem
 long LinuxParser::CachedMem() {
-  return *MemoryData()["cached"];
+  unordered_map<string, int>* memory_data = MemoryData();
+  return *memory_data["cached"];
 }
 
 // Read and return swap memory: SwapTotal - SwapFree
 long LinuxParser::SwapMem() {
-  return *MemoryData()["swap"];
+  unordered_map<string, int>* memory_data = MemoryData();
+  return *memory_data["swap"];
 }
 
 // Read and return the system uptime
