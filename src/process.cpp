@@ -43,7 +43,7 @@ long int Process::UpTime() {
 }
 
 // Overload the "less than" comparison operator for Process objects
-bool Process::operator<(Process const& a) const { 
+bool Process::operator<(Process& a) const { 
     if (Pid() < a.Pid()) {
         return true; 
     }
