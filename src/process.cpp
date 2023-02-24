@@ -19,7 +19,7 @@ int Process::Pid() {
 // Return this process's CPU utilization
 float Process::CpuUtilization() { 
     long hertz = sysconf(_SC_CLK_TCK);
-    return 100 * (LinuxParser::ActiveJiffies(this->pid)/hertz) / this->UpTime(); 
+    return 100 * (LinuxParser::ActiveJiffies(this->Pid())/hertz) / this->UpTime(); 
 }
 
 // Return the command that generated this process
@@ -44,7 +44,7 @@ long int Process::UpTime() {
 
 // Overload the "less than" comparison operator for Process objects
 bool Process::operator<(Process const& a) const { 
-    if (this->Pid() < a->Pid()) {
+    if (Pid() < a.Pid()) {
         return true; 
     }
     return false;
