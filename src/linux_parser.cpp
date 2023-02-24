@@ -96,18 +96,19 @@ int LinuxParser::NumProcessors() {
 }
 
 // Read and return the system memory data as a dictionary for further processing
-unordered_map<string, int>& LinuxParser::MemoryData() { 
+unordered_map<string, int>* LinuxParser::MemoryData() { 
   // Memory utilization to be calculated as total memory as a dict of memory, non-cache/buffer memory, buffers, cached memory, swap
   unordered_map<string, int> memory_data;
   string line, token;
+  int memory_usage;
 
   std::ifstream stream(kProcDirectory + kStatFilename);
     if (stream.is_open()) {
       while (std::getline(stream, line)) {
         // Grab the token from the start of the line, then use it win our dict to assign the value (from istream_iterator since only one int) to the key. 
         std::istringstream linestream(line);
-        linestream >> token;
-        memory_data[token] = std::istream_iterator<int>(linestream);
+        linestream >> token >> memory_usage;
+        memory_data[token] = memory_usage;
       }
     }
 
@@ -123,7 +124,7 @@ unordered_map<string, int>& LinuxParser::MemoryData() {
   parsed_mem_data["cached"] = memory_data["Cached"] + memory_data["Sreclaimable"] - memory_data["Shmem"];
   parsed_mem_data["swap"] = memory_data["SwapTotal"] - memory_data["SwapFree"];
 
-  return &parsed_mem_data; 
+  return *parsed_mem_data; 
 }
 
 // Read and return the system memory utilization
@@ -347,7 +348,7 @@ string LinuxParser::Uid(int pid) {
 string LinuxParser::User(int pid) { 
   string user;
   string line;
-  int id;
+  string id;
 
   std::ifstream stream(kPasswordPath);
   if (stream.is_open()) {
@@ -355,7 +356,7 @@ string LinuxParser::User(int pid) {
       std::istringstream linestream(line);
       linestream >> user >> id;
 
-      if (id == Uid(pid)) {
+      if (strcmp(id, Uid(pid))) {
         break;
       }
     }
