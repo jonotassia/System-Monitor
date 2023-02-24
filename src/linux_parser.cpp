@@ -189,7 +189,7 @@ long LinuxParser::ActiveJiffies(int pid) {
 }
 
 // Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies(int cpu_number) { 
+long LinuxParser::ActiveCpuJiffies(int cpu_number) { 
   vector<long> jiffies;
   long active_jiffies;
   string line, token;
@@ -239,7 +239,7 @@ long LinuxParser::IdleJiffies(int cpu_number) {
 
 // Read and return the number of jiffies for each processor
 long LinuxParser::Jiffies(int cpu_number) { 
-  return ActiveJiffies(cpu_number) + IdleJiffies(cpu_number); 
+  return ActiveCpuJiffies(cpu_number) + IdleJiffies(cpu_number); 
 }
 
 // Read and return CPU utilization
@@ -355,7 +355,7 @@ string LinuxParser::User(int pid) {
       std::istringstream linestream(line);
       linestream >> user >> id;
 
-      if (id == std::to_string(Uid(pid))) {
+      if (id == Uid(pid)) {
         break;
       }
     }

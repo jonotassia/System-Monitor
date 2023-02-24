@@ -22,7 +22,7 @@ const std::string kPasswordPath{"/etc/passwd"};
 // System
 int NumProcessors();
 float MemoryUtilization();
-std::unordered_map<string, int>& MemoryData();
+std::unordered_map<std::string, int>& MemoryData();
 long NonCacheBufferMem();
 long BufferMem();
 long CachedMem();
@@ -49,7 +49,7 @@ enum CPUStates {
 };
 float CpuUtilization(int cpu_number);
 long Jiffies(int cpu_number);
-long ActiveJiffies(int cpu_number);
+long ActiveCpuJiffies(int cpu_number);
 long ActiveJiffies(int pid);
 long IdleJiffies(int cpu_number);
 
