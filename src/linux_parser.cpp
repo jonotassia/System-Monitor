@@ -201,10 +201,9 @@ long LinuxParser::ActiveJiffies(int cpu_number) {
       std::istringstream linestream(line);
       linestream >> token;
 
-      // Stream the cpu_number and attach to cpu string to check for equality, then return a vector of relevant cpu jiffy data
-      std::ostringstream oss;
-      if (token == oss << "cpu" << std::to_string(cpu_number)) {
-        copy(std::istring_iterator<long>(linestream), std::istring_iterator(), std::back_insertor(jiffies));
+      // Check for equality, then return a vector of relevant cpu jiffy data
+      if (token == "cpu" << std::to_string(cpu_number)) {
+        copy(std::istream_iterator<long>(linestream), std::istream_iterator(), std::back_inserter(jiffies));
         break;
       }
     }
@@ -217,7 +216,6 @@ long LinuxParser::ActiveJiffies(int cpu_number) {
 // Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies(int cpu_number) { 
   vector<long> jiffies;
-  long idle_jiffies;
   string line, token;
 
   std::ifstream stream(kProcDirectory + kStatFilename);
@@ -227,17 +225,15 @@ long LinuxParser::IdleJiffies(int cpu_number) {
       std::istringstream linestream(line);
       linestream >> token;
 
-      // Stream the cpu_number and attach to cpu string to check for equality, then return a vector of relevant cpu jiffy data
-      std::ostringstream oss;
-      if (token == oss << "cpu" << std::to_string(cpu_number)) {
-        copy(std::istring_iterator<long>(linestream), std::istring_iterator(), std::back_insertor(jiffies));
+      // Check for equality, then return a vector of relevant cpu jiffy data
+      if (token == "cpu" << std::to_string(cpu_number)) {
+        copy(std::istream_iterator<long>(linestream), std::istream_iterator(), std::back_inserter(jiffies));
         break;
       }
     }
   }
-  }
   // Sum up the relevant jiffies for total idle number: idle + iowait
-  idle_jiffies = jiffies[3] + jiffies[4];
+  long idle_jiffies = jiffies[3] + jiffies[4];
   return idle_jiffies;  
 }
 
