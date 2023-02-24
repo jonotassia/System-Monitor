@@ -134,22 +134,22 @@ float LinuxParser::MemoryUtilization() {
 }
 
 // Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
-int LinuxParser::NonCacheBufferMem() {
+long LinuxParser::NonCacheBufferMem() {
   return *MemoryData()["non_cache_buffer"];
 }
 
 // Read and return buffer memory
-int LinuxParser::BufferMem() {
+long LinuxParser::BufferMem() {
   return *MemoryData()["buffers"];
 }
 
 // Read and return cached memory: Cached + SReclaimable - Shmem
-int LinuxParser::CachedMem() {
+long LinuxParser::CachedMem() {
   return *MemoryData()["cached"];
 }
 
 // Read and return swap memory: SwapTotal - SwapFree
-int LinuxParser::SwapMem() {
+long LinuxParser::SwapMem() {
   return *MemoryData()["swap"];
 }
 
