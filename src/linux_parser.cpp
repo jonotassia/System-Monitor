@@ -184,7 +184,7 @@ long LinuxParser::ActiveJiffies(int pid) {
   string line;
 
   // Gather data from proc/pid/stat file
-  std::ifstream stream(kProcDirectory + pid + "/" + kStatFilename);
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + "/" + kStatFilename);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
