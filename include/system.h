@@ -21,8 +21,8 @@ class System {
 
   // Define any necessary private members
  private:
-  vector<Processor> cpu_ = {};
-  vector<Process> processes_ = {};
+  std::vector<Processor> cpu_ = {};
+  std::vector<Process> processes_ = {};
 };
 
 #endif
