@@ -202,8 +202,8 @@ long LinuxParser::ActiveJiffies(int cpu_number) {
       linestream >> token;
 
       // Check for equality, then return a vector of relevant cpu jiffy data
-      if (token == "cpu" << std::to_string(cpu_number)) {
-        copy(std::istream_iterator<long>(linestream), std::istream_iterator(), std::back_inserter(jiffies));
+      if (token == "cpu" + std::to_string(cpu_number)) {
+        copy(std::istream_iterator<long>(linestream), std::istream_iterator<long>(), std::back_inserter(jiffies));
         break;
       }
     }
@@ -226,8 +226,8 @@ long LinuxParser::IdleJiffies(int cpu_number) {
       linestream >> token;
 
       // Check for equality, then return a vector of relevant cpu jiffy data
-      if (token == "cpu" << std::to_string(cpu_number)) {
-        copy(std::istream_iterator<long>(linestream), std::istream_iterator(), std::back_inserter(jiffies));
+      if (token == "cpu" + std::to_string(cpu_number)) {
+        copy(std::istream_iterator<long>(linestream), std::istream_iterator<long>(), std::back_inserter(jiffies));
         break;
       }
     }
