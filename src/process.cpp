@@ -22,7 +22,7 @@ int Process::Pid() const {
 // Return this process's CPU utilization
 float Process::CpuUtilization() { 
     long hertz = sysconf(_SC_CLK_TCK);
-    return 100 * (LinuxParser::ActiveJiffies(this->Pid())/hertz) / this->UpTime(); 
+    return (LinuxParser::ActiveJiffies(this->Pid())/hertz) / this->UpTime(); 
 }
 
 // Return the command that generated this process

@@ -166,7 +166,7 @@ long LinuxParser::UpTime() {
 
   // Since file only contains 2 numbers in a single line, stream it a single time and assign first value to uptime
   if (stream.is_open()) {
-    std::getline(stream, line); 
+    std::getline(stream, line, ' '); 
     std::istringstream linestream(line);
     linestream >> uptime;
   }
@@ -187,10 +187,10 @@ long LinuxParser::ActiveJiffies(int pid) {
     }
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-  long utime = std::stol(jiffies[14]);
-  long stime = std::stol(jiffies[15]);
-  long cutime = std::stol(jiffies[16]);
-  long cstime = std::stol(jiffies[17]);
+  long utime = std::stol(jiffies[13]);
+  long stime = std::stol(jiffies[14]);
+  long cutime = std::stol(jiffies[15]);
+  long cstime = std::stol(jiffies[16]);
   return utime + stime + cutime + cstime; 
 }
 
@@ -338,7 +338,7 @@ string LinuxParser::Uid(int pid) {
       std::istringstream linestream(line);
       linestream >> token;
 
-      if (token == "uid:") {
+      if (token == "Uid:") {
           linestream >> uid;
           break;
       }
@@ -349,18 +349,18 @@ string LinuxParser::Uid(int pid) {
 
 // Read and return the user associated with a process
 string LinuxParser::User(int pid) { 
-  string user, id;
+  string user, middle_char, id;
   string line;
 
   std::ifstream stream(kPasswordPath);
   if (stream.is_open()) {
-    while (std::getline(stream, line)) {
+    while (std::getline(stream, line) && id != Uid(pid)) {
       std::istringstream linestream(line);
-      linestream >> user >> ":" >> id >> ":";
 
-      if (id == Uid(pid)) {
-        break;
-      }
+      // Get user by splitting line by ":", then get "x" in between user and id, then get id
+      std::getline(linestream, user, ':');
+      std::getline(linestream, middle_char, ':');
+      std::getline(linestream, id, ':');
     }
   }
   return user; 
@@ -380,7 +380,7 @@ long LinuxParser::UpTime(int pid){
     }
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-  long starttime = std::stol(jiffies[22]);
+  long starttime = std::stol(jiffies[21]);
   long hertz = sysconf(_SC_CLK_TCK);
   int uptime = UpTime() - starttime / hertz;
 

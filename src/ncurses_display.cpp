@@ -53,7 +53,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   // Loop through processors in system
     for (auto proc : system.Cpu()) {
     mvwprintw(window, ++row, 2, 
-              ("CPU" + std::to_string(proc.CpuNumber()) + ": ").data());
+              ("CPU" + std::to_string(proc.CpuNumber()) + ": ").c_str());
     wattron(window, COLOR_PAIR(1));
     wprintw(window, (ProgressBar(proc.Utilization()).c_str()));
     wattroff(window, COLOR_PAIR(1));
