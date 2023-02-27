@@ -30,31 +30,30 @@ std::string NCursesDisplay::ProgressBar(float percent) {
 }
 
 //Create progress bar to handle memory data
-std::string NCursesDisplay::MemoryBar(float percent, System& system, WINDOW* window) {
+std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
+  float percent = system.MemoryUtilization();
   std::string result{"0%"};
   int size{50};
   float bars{percent * size};
   
   // Get size of each type of memory normalized to 50 for printing in different colors
-  std::vector<long> memory_data{system.NonCacheBufferMem, system.BufferMem, system.CachedMem, system.SwapMem};
-
+  std::vector<long> memory_data{system.NonCacheBufferMem(), system.BufferMem(), system.CachedMem(), system.SwapMem()};
 
   // Loop through the list of different memory types, compare to total usage, and assign different colors
   int color_counter = 1;
   int bar_count = 0;
 
   for (long mem :  memory_data) {
-    float mem_usage = mem / system.TotalMemoryUsage();
-    float mem_bars = bars - bar_count; 
-    wattron(window, COLOR_PAIR(color_counter))
+    float mem_usage = (float)mem / system.TotalMemoryUsage() * size;
+    wattron(window, COLOR_PAIR(color_counter));
 
     // Loop through each set of memory usages, accounting for current position in bar count
-    for (int i{bar_count}; i < bar_count + mem_usage; ++i) {
-      result += i <= mem_bars ? '|' : ' ';
+    for (int i{bar_count}; i <= mem_usage; ++i) {
+      result += '|';
       bar_count++;
     }
     
-    wattroff(window, COLOR_PAIR(color_counter))
+    wattroff(window, COLOR_PAIR(color_counter));
     color_counter++;
   }
 
@@ -88,7 +87,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, ++row, 2, "Memory: ");
   wattron(window, COLOR_PAIR(1));
   mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.MemoryUtilization()).c_str());
+  wprintw(window, ProgressBar(system, window).c_str());
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());

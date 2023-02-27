@@ -51,12 +51,7 @@ long System::TotalMemoryUsage() {
     return LinuxParser::TotalMemoryUsage();
 }
 
-// Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
-long System::NonCacheBufferMem() { 
-    return LinuxParser::NonCacheBufferMem(); 
-}
-
-// Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
+// Read and return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
 long System::NonCacheBufferMem() { 
     return LinuxParser::NonCacheBufferMem(); 
 }
