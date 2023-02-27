@@ -16,13 +16,12 @@ using std::vector;
 
 // Sets and return the system's CPU
 vector<Processor>& System::Cpu() { 
-    if (cpu_.size == 0) {
+    if (cpu_.size() == 0) {
         int num_processors = LinuxParser::NumProcessors();
-        vector<Processor>& processors;
 
         // Initialize and pushback processors
-        for (int i = 1; i <= proc_count; i++) {
-            processors->push_back(Processor(i));
+        for (int i = 1; i <= num_processors; i++) {
+            cpu_.push_back(Processor(i));
         }
     }
     return cpu_; 
@@ -31,7 +30,9 @@ vector<Processor>& System::Cpu() {
 // Return a container composed of the system's processes
 vector<Process>& System::Processes() { 
     if (processes_.size() == 0) {
-        processes_ = LinuxParser::Pids();
+        for (int pid : LinuxParser::Pids()) {
+            processes_.push_back(Process(pid));
+        }
     }
     return processes_; 
 }

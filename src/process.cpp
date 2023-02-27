@@ -11,8 +11,11 @@ using std::string;
 using std::to_string;
 using std::vector;
 
+// Constructor for generating a new Process from a pid
+Process::Process(int pid) : pid_(pid) {}
+
 // Return this process's ID
-int Process::Pid() { 
+int Process::Pid() const { 
     return this->pid_; 
 }
 
