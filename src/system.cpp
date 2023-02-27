@@ -20,7 +20,7 @@ vector<Processor>& System::Cpu() {
         int num_processors = LinuxParser::NumProcessors();
 
         // Initialize and pushback processors
-        for (int i = 1; i <= num_processors; i++) {
+        for (int i = 0; i < num_processors; i++) {
             cpu_.push_back(Processor(i));
         }
     }

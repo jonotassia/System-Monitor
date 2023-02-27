@@ -22,7 +22,7 @@ const std::string kPasswordPath{"/etc/passwd"};
 // System
 int NumProcessors();
 float MemoryUtilization();
-std::unordered_map<std::string, int> MemoryData();
+std::unordered_map<std::string, long> MemoryData();
 long NonCacheBufferMem();
 long BufferMem();
 long CachedMem();

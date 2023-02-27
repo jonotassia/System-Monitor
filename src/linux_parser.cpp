@@ -82,13 +82,13 @@ int LinuxParser::NumProcessors() {
       std::istringstream linestream(line);
       linestream >> token;
 
-      // Increment proc_count by 1 for each loop, starting at -1 in order to avoid pulling in the aggregate cpu
-      proc_count++;
-
       // Break once the CPU section has been passed
       if (token == "intr") {
         break;
       }
+
+      // Increment proc_count by 1 for each loop, starting at -1 in order to avoid pulling in the aggregate cpu
+      proc_count++;
     }
   }
 
@@ -96,24 +96,24 @@ int LinuxParser::NumProcessors() {
 }
 
 // Read and return the system memory data as a dictionary for further processing
-unordered_map<string, int> LinuxParser::MemoryData() { 
+unordered_map<string, long> LinuxParser::MemoryData() { 
   // Memory utilization to be calculated as total memory as a dict of memory, non-cache/buffer memory, buffers, cached memory, swap
-  unordered_map<string, int> memory_data;
+  unordered_map<string, long> memory_data;
   string line, token;
-  int memory_usage;
+  string memory_usage;
 
-  std::ifstream stream(kProcDirectory + kStatFilename);
+  std::ifstream stream(kProcDirectory + kMeminfoFilename);
     if (stream.is_open()) {
-      while (std::getline(stream, line)) {
+      while (std::getline(stream, line) && token != "Sreclaimable") {
         // Grab the token from the start of the line, then use it win our dict to assign the value (from istream_iterator since only one int) to the key. 
         std::istringstream linestream(line);
         linestream >> token >> memory_usage;
-        memory_data[token] = memory_usage;
+        memory_data[token] = std::stol(memory_usage);
       }
     }
 
   // Define dict and dict values
-  unordered_map<string, int> parsed_mem_data;
+  unordered_map<string, long> parsed_mem_data;
   string total_usage, non_cache_buffer, buffer, cache, swap;
 
   // Parse data into relevant chunks for calling
@@ -129,31 +129,31 @@ unordered_map<string, int> LinuxParser::MemoryData() {
 
 // Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { 
-  unordered_map<string, int> mem_data = MemoryData();
+  unordered_map<string, long> mem_data = MemoryData();
   return 100 * (mem_data["mem_total"] - mem_data["mem_free"]) / mem_data["mem_total"];
 }
 
 // Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
 long LinuxParser::NonCacheBufferMem() {
-  unordered_map<string, int> memory_data = MemoryData();
+  unordered_map<string, long> memory_data = MemoryData();
   return memory_data["non_cache_buffer"];
 }
 
 // Read and return buffer memory
 long LinuxParser::BufferMem() {
-  unordered_map<string, int> memory_data = MemoryData();
+  unordered_map<string, long> memory_data = MemoryData();
   return memory_data["buffers"];
 }
 
 // Read and return cached memory: Cached + SReclaimable - Shmem
 long LinuxParser::CachedMem() {
-  unordered_map<string, int> memory_data = MemoryData();
+  unordered_map<string, long> memory_data = MemoryData();
   return memory_data["cached"];
 }
 
 // Read and return swap memory: SwapTotal - SwapFree
 long LinuxParser::SwapMem() {
-  unordered_map<string, int> memory_data = MemoryData();
+  unordered_map<string, long> memory_data = MemoryData();
   return memory_data["swap"];
 }
 
@@ -174,7 +174,7 @@ long LinuxParser::UpTime() {
 
 // Read and return the number of active jiffies for a PID
 long LinuxParser::ActiveJiffies(int pid) { 
-  vector<long> jiffies;
+  vector<string> jiffies;
   string line;
 
   // Gather data from proc/pid/stat file
@@ -182,14 +182,14 @@ long LinuxParser::ActiveJiffies(int pid) {
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
-      copy(std::istream_iterator<long>(linestream), std::istream_iterator<long>(), std::back_inserter(jiffies));
+      copy(std::istream_iterator<string>(linestream), std::istream_iterator<string>(), std::back_inserter(jiffies));
     }
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-  long utime = jiffies[14];
-  long stime = jiffies[15];
-  long cutime = jiffies[16];
-  long cstime = jiffies[17];
+  long utime = std::stol(jiffies[14]);
+  long stime = std::stol(jiffies[15]);
+  long cutime = std::stol(jiffies[16]);
+  long cstime = std::stol(jiffies[17]);
   return utime + stime + cutime + cstime; 
 }
 
