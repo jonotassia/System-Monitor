@@ -131,7 +131,7 @@ unordered_map<string, long> LinuxParser::MemoryData() {
 // Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { 
   unordered_map<string, long> mem_data = MemoryData();
-  return 100 * (mem_data["mem_total"] - mem_data["mem_free"]) / mem_data["mem_total"];
+  return (mem_data["mem_total"] - mem_data["mem_free"]) / (float)mem_data["mem_total"];
 }
 
 // Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
@@ -160,7 +160,7 @@ long LinuxParser::SwapMem() {
 
 // Read and return the system uptime
 long LinuxParser::UpTime() { 
-  long uptime;
+  string uptime;
   string line;
   std::ifstream stream(kProcDirectory + kUptimeFilename);
 
@@ -170,7 +170,7 @@ long LinuxParser::UpTime() {
     std::istringstream linestream(line);
     linestream >> uptime;
   }
-  return uptime; 
+  return std::stol(uptime); 
 }
 
 // Read and return the number of active jiffies for a PID
@@ -287,7 +287,7 @@ int LinuxParser::RunningProcesses() {
     std::istringstream linestream(line);
     linestream >> token >> proc_running;
 
-    if (token == "processes") {
+    if (token == "procs_running") {
       return proc_running;
     }
   }
@@ -310,8 +310,7 @@ string LinuxParser::Command(int pid) {
 
 // Read and return the memory used by a process
 string LinuxParser::Ram(int pid) { 
-  long ram;
-  string token, line;
+  string token, line, ram;
 
   std::ifstream stream(kProcDirectory + std::to_string(pid) + "/" + kStatusFilename);
   if (stream.is_open()) {
@@ -325,7 +324,7 @@ string LinuxParser::Ram(int pid) {
       }
     }
   }
-  return std::to_string(ram/1000); 
+  return std::to_string(std::stol(ram)/1000); 
 }
 
 // Reads and returns the User ID for this process
@@ -350,17 +349,16 @@ string LinuxParser::Uid(int pid) {
 
 // Read and return the user associated with a process
 string LinuxParser::User(int pid) { 
-  string user;
+  string user, id;
   string line;
-  int id;
 
   std::ifstream stream(kPasswordPath);
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
-      linestream >> user >> id;
+      linestream >> user >> ":" >> id >> ":";
 
-      if (std::to_string(id) == Uid(pid)) {
+      if (id == Uid(pid)) {
         break;
       }
     }
@@ -370,7 +368,7 @@ string LinuxParser::User(int pid) {
 
 // Read and return the uptime of a process
 long LinuxParser::UpTime(int pid){
-  vector<long> jiffies;
+  vector<string> jiffies;
   string line;
 
   // Gather data from proc/pid/stat file
@@ -378,11 +376,11 @@ long LinuxParser::UpTime(int pid){
   if (stream.is_open()) {
     while (std::getline(stream, line)) {
       std::istringstream linestream(line);
-      copy(std::istream_iterator<long>(linestream), std::istream_iterator<long>(), std::back_inserter(jiffies));
+      copy(std::istream_iterator<string>(linestream), std::istream_iterator<string>(), std::back_inserter(jiffies));
     }
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-  long starttime = jiffies[22];
+  long starttime = std::stol(jiffies[22]);
   long hertz = sysconf(_SC_CLK_TCK);
   int uptime = UpTime() - starttime / hertz;
 

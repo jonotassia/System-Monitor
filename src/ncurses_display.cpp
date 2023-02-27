@@ -52,7 +52,8 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, row, 10, "");
   // Loop through processors in system
     for (auto proc : system.Cpu()) {
-    mvwprintw(window, ++row, 2, ("CPU" + std::to_string(proc.CpuNumber()) + ": ").data());
+    mvwprintw(window, ++row, 2, 
+              ("CPU" + std::to_string(proc.CpuNumber()) + ": ").data());
     wattron(window, COLOR_PAIR(1));
     wprintw(window, (ProgressBar(proc.Utilization()).c_str()));
     wattroff(window, COLOR_PAIR(1));
@@ -65,9 +66,8 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
-  mvwprintw(
-      window, ++row, 2,
-      ("Running Processes: " + to_string(system.RunningProcesses())).c_str());
+  mvwprintw(window, ++row, 2,
+            ("Running Processes: " + to_string(system.RunningProcesses())).c_str());
   mvwprintw(window, ++row, 2,
             ("Up Time: " + Format::ElapsedTime(system.UpTime())).c_str());
   wrefresh(window);
@@ -114,7 +114,7 @@ void NCursesDisplay::Display(System& system, int n) {
   start_color();  // enable color
 
   int x_max{getmaxx(stdscr)};
-  WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
+  WINDOW* system_window = newwin(8+system.Cpu().size(), x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
 
