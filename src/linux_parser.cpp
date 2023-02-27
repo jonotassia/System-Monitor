@@ -195,8 +195,7 @@ long LinuxParser::ActiveJiffies(int pid) {
 
 // Read and return the number of active jiffies for the system
 long LinuxParser::ActiveCpuJiffies(int cpu_number) { 
-  vector<long> jiffies;
-  long active_jiffies;
+  vector<string> jiffies;
   string line, token;
 
   std::ifstream stream(kProcDirectory + kStatFilename);
@@ -208,19 +207,19 @@ long LinuxParser::ActiveCpuJiffies(int cpu_number) {
 
       // Check for equality, then return a vector of relevant cpu jiffy data
       if (token == "cpu" + std::to_string(cpu_number)) {
-        copy(std::istream_iterator<long>(linestream), std::istream_iterator<long>(), std::back_inserter(jiffies));
+        copy(std::istream_iterator<string>(linestream), std::istream_iterator<string>(), std::back_inserter(jiffies));
         break;
       }
     }
   }
   // Sum up the relevant jiffies for total active number: user + nice + system + irq + softirq + steal
-  active_jiffies = jiffies[0] + jiffies[1] + jiffies[2] + jiffies[5] + jiffies[6] + jiffies[7];
+  long active_jiffies = std::stol(jiffies[0]) + std::stol(jiffies[1]) + std::stol(jiffies[2]) + std::stol(jiffies[5]) + std::stol(jiffies[6]) + std::stol(jiffies[7]);
   return active_jiffies; 
 }
 
 // Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies(int cpu_number) { 
-  vector<long> jiffies;
+  vector<string> jiffies;
   string line, token;
 
   std::ifstream stream(kProcDirectory + kStatFilename);
@@ -232,13 +231,13 @@ long LinuxParser::IdleJiffies(int cpu_number) {
 
       // Check for equality, then return a vector of relevant cpu jiffy data
       if (token == "cpu" + std::to_string(cpu_number)) {
-        copy(std::istream_iterator<long>(linestream), std::istream_iterator<long>(), std::back_inserter(jiffies));
+        copy(std::istream_iterator<string>(linestream), std::istream_iterator<string>(), std::back_inserter(jiffies));
         break;
       }
     }
   }
   // Sum up the relevant jiffies for total idle number: idle + iowait
-  long idle_jiffies = jiffies[3] + jiffies[4];
+  long idle_jiffies = std::stol(jiffies[3]) + std::stol(jiffies[4]);
   return idle_jiffies;  
 }
 
