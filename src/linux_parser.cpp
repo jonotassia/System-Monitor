@@ -104,24 +104,25 @@ unordered_map<string, long> LinuxParser::MemoryData() {
 
   std::ifstream stream(kProcDirectory + kMeminfoFilename);
     if (stream.is_open()) {
-      while (std::getline(stream, line) && token != "Sreclaimable") {
+      while (std::getline(stream, line) && token != "SReclaimable") {
         // Grab the token from the start of the line, then use it win our dict to assign the value (from istream_iterator since only one int) to the key. 
         std::istringstream linestream(line);
         linestream >> token >> memory_usage;
+        // Process string for adding to dictionary
+        token.erase(token.end()-1, token.end());
         memory_data[token] = std::stol(memory_usage);
       }
     }
 
   // Define dict and dict values
   unordered_map<string, long> parsed_mem_data;
-  string total_usage, non_cache_buffer, buffer, cache, swap;
 
   // Parse data into relevant chunks for calling
   parsed_mem_data["mem_total"] = memory_data["MemTotal"];
   parsed_mem_data["mem_free"] = memory_data["MemFree"];
   parsed_mem_data["non_cache_buffer"] = memory_data["MemTotal"] - memory_data["MemFree"] - memory_data["Buffers"] + memory_data["Cached"];
   parsed_mem_data["buffers"] = memory_data["Buffers"];
-  parsed_mem_data["cached"] = memory_data["Cached"] + memory_data["Sreclaimable"] - memory_data["Shmem"];
+  parsed_mem_data["cached"] = memory_data["Cached"] + memory_data["SReclaimable"] - memory_data["Shmem"];
   parsed_mem_data["swap"] = memory_data["SwapTotal"] - memory_data["SwapFree"];
 
   return parsed_mem_data; 
