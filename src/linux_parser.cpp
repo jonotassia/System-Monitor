@@ -129,7 +129,7 @@ unordered_map<string, int> LinuxParser::MemoryData() {
 
 // Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { 
-  unordered_map mem_data = MemoryData();
+  unordered_map<string, int> mem_data = MemoryData();
   return 100 * (mem_data["mem_total"] - mem_data["mem_free"]) / mem_data["mem_total"];
 }
 
