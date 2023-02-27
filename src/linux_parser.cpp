@@ -134,7 +134,13 @@ float LinuxParser::MemoryUtilization() {
   return (mem_data["mem_total"] - mem_data["mem_free"]) / (float)mem_data["mem_total"];
 }
 
-// Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
+// Read and return Total memory usage
+long LinuxParser::TotalMemoryUsage() {
+  unordered_map<string, long> memory_data = MemoryData();
+  return memory_data["mem_total"];
+}
+
+// Read and return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
 long LinuxParser::NonCacheBufferMem() {
   unordered_map<string, long> memory_data = MemoryData();
   return memory_data["non_cache_buffer"];

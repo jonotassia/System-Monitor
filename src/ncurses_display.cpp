@@ -29,21 +29,47 @@ std::string NCursesDisplay::ProgressBar(float percent) {
   return result + " " + display + "/100%";
 }
 
-// //Create progress bar to handle memory data
-// std::string NCursesDisplay::MemoryBar(float percent) {
-//   std::string result{"0%"};
-//   int size{50};
-//   float bars{percent * size};
+//Create progress bar to handle memory data
+std::string NCursesDisplay::MemoryBar(float percent, System& system, WINDOW* window) {
+  std::string result{"0%"};
+  int size{50};
+  float bars{percent * size};
+  
+  // Get size of each type of memory normalized to 50 for printing in different colors
+  std::vector<long> memory_data{system.NonCacheBufferMem, system.BufferMem, system.CachedMem, system.SwapMem};
 
-//   for (int i{0}; i < size; ++i) {
-//     result += i <= bars ? '|' : ' ';
-//   }
 
-//   string display{to_string(percent * 100).substr(0, 4)};
-//   if (percent < 0.1 || percent == 1.0)
-//     display = " " + to_string(percent * 100).substr(0, 3);
-//   return result + " " + display + "/100%";
-// }
+  // Loop through the list of different memory types, compare to total usage, and assign different colors
+  int color_counter = 1;
+  int bar_count = 0;
+
+  for (long mem :  memory_data) {
+    float mem_usage = mem / system.TotalMemoryUsage();
+    float mem_bars = bars - bar_count; 
+    wattron(window, COLOR_PAIR(color_counter))
+
+    // Loop through each set of memory usages, accounting for current position in bar count
+    for (int i{bar_count}; i < bar_count + mem_usage; ++i) {
+      result += i <= mem_bars ? '|' : ' ';
+      bar_count++;
+    }
+    
+    wattroff(window, COLOR_PAIR(color_counter))
+    color_counter++;
+  }
+
+  // Print remainder
+  for (int i{bar_count}; i < size; i++) {
+    result += i <= bars ? '|' : ' ';
+    bar_count++;
+  }
+    
+
+  string display{to_string(percent * 100).substr(0, 4)};
+  if (percent < 0.1 || percent == 1.0)
+    display = " " + to_string(percent * 100).substr(0, 3);
+  return result + " " + display + "/100%";
+}
 
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};

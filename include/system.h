@@ -12,7 +12,12 @@ class System {
  public:
   std::vector<Processor>& Cpu();                   
   std::vector<Process>& Processes();  
-  float MemoryUtilization();          
+  float MemoryUtilization();
+  long TotalMemoryUsage();
+  long NonCacheBufferMem();
+  long BufferMem();
+  long CachedMem();
+  long SwapMem();          
   long UpTime();                      
   int TotalProcesses();               
   int RunningProcesses();             

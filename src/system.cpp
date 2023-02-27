@@ -47,6 +47,35 @@ float System::MemoryUtilization() {
     return LinuxParser::MemoryUtilization(); 
 }
 
+long System::TotalMemoryUsage() {
+    return LinuxParser::TotalMemoryUsage();
+}
+
+// Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
+long System::NonCacheBufferMem() { 
+    return LinuxParser::NonCacheBufferMem(); 
+}
+
+// Read amd return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
+long System::NonCacheBufferMem() { 
+    return LinuxParser::NonCacheBufferMem(); 
+}
+
+// Read and return buffer memory
+long System::BufferMem() { 
+    return LinuxParser::BufferMem(); 
+}
+
+// Read and return cached memory: Cached + SReclaimable - Shmem
+long System::CachedMem() { 
+    return LinuxParser::CachedMem(); 
+}
+
+// Read and return swap memory: SwapTotal - SwapFree
+long System::SwapMem() { 
+    return LinuxParser::SwapMem(); 
+}
+
 // Return the operating system name
 std::string System::OperatingSystem() { 
     return LinuxParser::OperatingSystem(); 
