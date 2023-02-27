@@ -5,6 +5,7 @@ class Processor {
  public:
   Processor(int cpu_number);
   float Utilization();
+  int CpuNumber();
 
  private:
     int cpu_number_;
