@@ -35,14 +35,11 @@ std::string NCursesDisplay::MemoryBar(float percent) {
   int size{50};
   float bars{percent * size};
 
-  for (int i{0}; i < size; ++i) {
+  for (int i{0}; i < bars; ++i) {
     result += i <= bars ? '|' : ' ';
   }
 
-  // string display{to_string(percent * 100).substr(0, 4)};
-  // if (percent < 0.1 || percent == 1.0)
-  //   display = " " + to_string(percent * 100).substr(0, 3);
-  return result + " " + display + "/100%";
+  return result;
 }
 
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
@@ -70,7 +67,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   std::vector<long> memory_data{system.NonCacheBufferMem(), system.BufferMem(), system.CachedMem(), system.SwapMem()};
   // Loop through the list of different memory types, track position of bars, and assign different colors
   for (long mem :  memory_data) {
-    float mem_usage = mem / system.TotalMemoryUsage();
+    float mem_usage = (float)mem / system.TotalMemoryUsage();
     wattron(window, COLOR_PAIR(color_counter));
 
     // Loop through each set of memory usages, accounting for current position in bar count
@@ -80,13 +77,14 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
     color_counter++;
   }
   // End memory usage with total memory usage
+  float percent = system.MemoryUtilization();
   string display{to_string(percent * 100).substr(0, 4)};
   if (percent < 0.1 || percent == 1.0)
     display = " " + to_string(percent * 100).substr(0, 3);
 
-  wattron(window, COLOR_PAIR(color_counter));
-  wprintw(window, display + "/100%");
-  wattroff(window, COLOR_PAIR(color_counter));
+  wattron(window, COLOR_PAIR(4));
+  mvwprintw(window, row, 63, (display + "/100%").c_str());
+  wattroff(window, COLOR_PAIR(4));
 
   // Continue to remaining statistics
   mvwprintw(window, ++row, 2,
@@ -146,6 +144,8 @@ void NCursesDisplay::Display(System& system, int n) {
   while (1) {
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_RED, COLOR_BLACK);
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK);
     box(system_window, 0, 0);
     box(process_window, 0, 0);
     DisplaySystem(system, system_window);
