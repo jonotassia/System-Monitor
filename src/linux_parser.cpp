@@ -131,37 +131,49 @@ unordered_map<string, long> LinuxParser::MemoryData() {
 // Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { 
   unordered_map<string, long> mem_data = MemoryData();
-  return (mem_data["mem_total"] - mem_data["mem_free"]) / (float)mem_data["mem_total"];
+  float mem_usage1 = (mem_data["mem_total"] - mem_data["mem_free"]) / (float)mem_data["mem_total"];
+  float mem_usage2 = (mem_data["mem_total"] - mem_data["mem_free"]) / (float)mem_data["mem_total"];
+  return mem_usage2 - mem_usage1;
 }
 
 // Read and return Total memory usage
 long LinuxParser::TotalMemoryUsage() {
   unordered_map<string, long> memory_data = MemoryData();
-  return memory_data["mem_total"];
+  float mem_usage1 = memory_data["mem_total"];
+  float mem_usage2 = memory_data["mem_total"];
+  return mem_usage2 - mem_usage1;
 }
 
 // Read and return Non Cache/Buffer Memory: Total used memory - (Buffers + Cached memory)
 long LinuxParser::NonCacheBufferMem() {
   unordered_map<string, long> memory_data = MemoryData();
-  return memory_data["non_cache_buffer"];
+  float mem_usage1 = memory_data["non_cache_buffer"];
+  float mem_usage2 = memory_data["non_cache_buffer"];
+  return mem_usage2 - mem_usage1;
 }
 
 // Read and return buffer memory
 long LinuxParser::BufferMem() {
   unordered_map<string, long> memory_data = MemoryData();
-  return memory_data["buffers"];
+  float mem_usage1 = memory_data["buffers"];
+  float mem_usage2 = memory_data["buffers"];
+  return mem_usage2 - mem_usage1;
 }
 
 // Read and return cached memory: Cached + SReclaimable - Shmem
 long LinuxParser::CachedMem() {
   unordered_map<string, long> memory_data = MemoryData();
-  return memory_data["cached"];
+  float mem_usage1 = memory_data["cached"];
+  float mem_usage2 = memory_data["cached"];
+  return mem_usage2 - mem_usage1;
 }
 
 // Read and return swap memory: SwapTotal - SwapFree
 long LinuxParser::SwapMem() {
   unordered_map<string, long> memory_data = MemoryData();
-  return memory_data["swap"];
+  float mem_usage1 = memory_data["swap"];
+  float mem_usage2 = memory_data["swap"];
+  return mem_usage2 - mem_usage1;
 }
 
 // Read and return the system uptime
@@ -255,10 +267,16 @@ long LinuxParser::Jiffies(int cpu_number) {
 
 // Read and return CPU utilization
 float LinuxParser::CpuUtilization(int cpu_number) { 
-  float total = Jiffies(cpu_number);
-  float idle = IdleJiffies(cpu_number);
+  float total1 = Jiffies(cpu_number);
+  float idle1 = IdleJiffies(cpu_number);
+
+  float total2 = Jiffies(cpu_number);
+  float idle2 = IdleJiffies(cpu_number);
+
+  float delta_total = total2 - total1;
+  float delta_idle = idle2 - idle1;
   
-  return (total-idle)/total; 
+  return (delta_total-delta_idle)/delta_total; 
 }
 
 // Read and return the total number of processes
