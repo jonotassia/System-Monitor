@@ -48,9 +48,8 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
     wattron(window, COLOR_PAIR(color_counter));
 
     // Loop through each set of memory usages, accounting for current position in bar count
-    for (int i{bar_count}; i <= mem_usage; ++i) {
+    for (bar_count <= mem_usage; bar_count++) {
       result += '|';
-      bar_count++;
     }
     
     wattroff(window, COLOR_PAIR(color_counter));
@@ -58,9 +57,8 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
   }
 
   // Print remainder
-  for (int i{bar_count}; i < size; i++) {
+  for (bar_count < size; bar_count++) {
     result += i <= bars ? '|' : ' ';
-    bar_count++;
   }
     
 
