@@ -48,7 +48,7 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
     wattron(window, COLOR_PAIR(color_counter));
 
     // Loop through each set of memory usages, accounting for current position in bar count
-    for (bar_count; bar_count <= mem_usage; bar_count++) {
+    for (bar_count <= mem_usage; bar_count++) {
       result += '|';
     }
     
@@ -57,10 +57,9 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
   }
 
   // Print remainder
-  for (bar_count; bar_count < size; bar_count++) {
+  for (bar_count < size; bar_count++) {
     result += bar_count <= bars ? '|' : ' ';
   }
-    
 
   string display{to_string(percent * 100).substr(0, 4)};
   if (percent < 0.1 || percent == 1.0)
@@ -85,7 +84,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, ++row, 2, "Memory: ");
   wattron(window, COLOR_PAIR(1));
   mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system, window).c_str());
+  wprintw(window, MemoryBar(system, window).c_str());
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
