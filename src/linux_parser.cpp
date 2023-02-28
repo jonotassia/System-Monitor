@@ -120,10 +120,10 @@ unordered_map<string, long> LinuxParser::MemoryData() {
   // Parse data into relevant chunks for calling
   parsed_mem_data["mem_total"] = memory_data["MemTotal"];
   parsed_mem_data["mem_free"] = memory_data["MemFree"];
-  parsed_mem_data["non_cache_buffer"] = memory_data["MemTotal"] - memory_data["MemFree"] - memory_data["Buffers"] + memory_data["Cached"];
   parsed_mem_data["buffers"] = memory_data["Buffers"];
   parsed_mem_data["cached"] = memory_data["Cached"] + memory_data["SReclaimable"] - memory_data["Shmem"];
   parsed_mem_data["swap"] = memory_data["SwapTotal"] - memory_data["SwapFree"];
+  parsed_mem_data["non_cache_buffer"] = parsed_mem_data["mem_total"] - parsed_mem_data["mem_free"] - parsed_mem_data["buffers"] - parsed_mem_data["cached"];
 
   return parsed_mem_data; 
 }

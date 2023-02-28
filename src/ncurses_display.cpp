@@ -30,8 +30,8 @@ std::string NCursesDisplay::ProgressBar(float percent) {
 }
 
 //Create progress bar to handle memory data
-std::string NCursesDisplay::MemoryBar(float percent, std::string result) {
-  // std::string result{"0%"};
+std::string NCursesDisplay::MemoryBar(float percent) {
+  std::string result{""};
   int size{50};
   float bars{percent * size};
 
@@ -42,7 +42,7 @@ std::string NCursesDisplay::MemoryBar(float percent, std::string result) {
   // string display{to_string(percent * 100).substr(0, 4)};
   // if (percent < 0.1 || percent == 1.0)
   //   display = " " + to_string(percent * 100).substr(0, 3);
-  // return result + " " + display + "/100%";
+  return result + " " + display + "/100%";
 }
 
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
@@ -60,27 +60,35 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   }
   // Validate memory usage and account for different breakdowns of usage in different colors
   mvwprintw(window, ++row, 2, "Memory: ");
+  int color_counter = 1;
+
+  wattron(window, COLOR_PAIR(color_counter));
+  wprintw(window, "0%"); 
+  wattroff(window, COLOR_PAIR(color_counter));
   
   // Get size of each type of memory normalized to 50 for printing in different colors
   std::vector<long> memory_data{system.NonCacheBufferMem(), system.BufferMem(), system.CachedMem(), system.SwapMem()};
   // Loop through the list of different memory types, track position of bars, and assign different colors
-  int color_counter = 1;
-
   for (long mem :  memory_data) {
     float mem_usage = mem / system.TotalMemoryUsage();
     wattron(window, COLOR_PAIR(color_counter));
 
     // Loop through each set of memory usages, accounting for current position in bar count
-    wprintw(window, ProgressBar(mem_usage))
+    wprintw(window, MemoryBar(mem_usage).c_str());
     
     wattroff(window, COLOR_PAIR(color_counter));
     color_counter++;
   }
+  // End memory usage with total memory usage
+  string display{to_string(percent * 100).substr(0, 4)};
+  if (percent < 0.1 || percent == 1.0)
+    display = " " + to_string(percent * 100).substr(0, 3);
 
-  // wattron(window, COLOR_PAIR(1));
-  // mvwprintw(window, row, 10, "");
-  // wprintw(window, MemoryBar(system, window).c_str());
-  // wattroff(window, COLOR_PAIR(1));
+  wattron(window, COLOR_PAIR(color_counter));
+  wprintw(window, display + "/100%");
+  wattroff(window, COLOR_PAIR(color_counter));
+
+  // Continue to remaining statistics
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
   mvwprintw(window, ++row, 2,
