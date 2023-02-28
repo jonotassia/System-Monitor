@@ -44,11 +44,11 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
   int bar_count = 0;
 
   for (long mem :  memory_data) {
-    float mem_usage = (float)mem / system.TotalMemoryUsage() * size;
+    float mem_usage = mem / system.TotalMemoryUsage() * size;
     wattron(window, COLOR_PAIR(color_counter));
 
     // Loop through each set of memory usages, accounting for current position in bar count
-    for (bar_count <= mem_usage; bar_count++) {
+    for (bar_count; bar_count <= mem_usage; bar_count++) {
       result += '|';
     }
     
@@ -57,8 +57,8 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
   }
 
   // Print remainder
-  for (bar_count < size; bar_count++) {
-    result += i <= bars ? '|' : ' ';
+  for (bar_count; bar_count < size; bar_count++) {
+    result += bar_count <= bars ? '|' : ' ';
   }
     
 
