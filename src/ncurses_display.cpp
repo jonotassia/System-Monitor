@@ -41,6 +41,7 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
 
   // Loop through the list of different memory types, compare to total usage, and assign different colors
   int color_counter = 1;
+  // Track number of bars with bar_count to continue from the same place each time
   int bar_count = 0;
 
   for (long mem :  memory_data) {
@@ -48,8 +49,9 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
     wattron(window, COLOR_PAIR(color_counter));
 
     // Loop through each set of memory usages, accounting for current position in bar count
-    for (bar_count <= mem_usage; bar_count++) {
+    while (bar_count <= mem_usage) {
       result += '|';
+      bar_count++;
     }
     
     wattroff(window, COLOR_PAIR(color_counter));
@@ -57,8 +59,9 @@ std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
   }
 
   // Print remainder
-  for (bar_count < size; bar_count++) {
+  while (bar_count < size) {
     result += bar_count <= bars ? '|' : ' ';
+    bar_count++;
   }
 
   string display{to_string(percent * 100).substr(0, 4)};
