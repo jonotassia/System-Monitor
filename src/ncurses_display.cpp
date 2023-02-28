@@ -30,44 +30,19 @@ std::string NCursesDisplay::ProgressBar(float percent) {
 }
 
 //Create progress bar to handle memory data
-std::string NCursesDisplay::MemoryBar(System& system, WINDOW* window) {
-  float percent = system.MemoryUtilization();
-  std::string result{"0%"};
+std::string NCursesDisplay::MemoryBar(float percent, std::string result) {
+  // std::string result{"0%"};
   int size{50};
   float bars{percent * size};
-  
-  // Get size of each type of memory normalized to 50 for printing in different colors
-  std::vector<long> memory_data{system.NonCacheBufferMem(), system.BufferMem(), system.CachedMem(), system.SwapMem()};
 
-  // Loop through the list of different memory types, compare to total usage, and assign different colors
-  int color_counter = 1;
-  // Track number of bars with bar_count to continue from the same place each time
-  int bar_count = 0;
-
-  for (long mem :  memory_data) {
-    float mem_usage = mem / system.TotalMemoryUsage() * size;
-    wattron(window, COLOR_PAIR(color_counter));
-
-    // Loop through each set of memory usages, accounting for current position in bar count
-    while (bar_count <= mem_usage) {
-      result += '|';
-      bar_count++;
-    }
-    
-    wattroff(window, COLOR_PAIR(color_counter));
-    color_counter++;
+  for (int i{0}; i < size; ++i) {
+    result += i <= bars ? '|' : ' ';
   }
 
-  // Print remainder
-  while (bar_count < size) {
-    result += bar_count <= bars ? '|' : ' ';
-    bar_count++;
-  }
-
-  string display{to_string(percent * 100).substr(0, 4)};
-  if (percent < 0.1 || percent == 1.0)
-    display = " " + to_string(percent * 100).substr(0, 3);
-  return result + " " + display + "/100%";
+  // string display{to_string(percent * 100).substr(0, 4)};
+  // if (percent < 0.1 || percent == 1.0)
+  //   display = " " + to_string(percent * 100).substr(0, 3);
+  // return result + " " + display + "/100%";
 }
 
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
@@ -83,12 +58,29 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
     wprintw(window, (ProgressBar(proc.Utilization()).c_str()));
     wattroff(window, COLOR_PAIR(1));
   }
-  // Remove color after processor
+  // Validate memory usage and account for different breakdowns of usage in different colors
   mvwprintw(window, ++row, 2, "Memory: ");
-  wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, MemoryBar(system, window).c_str());
-  wattroff(window, COLOR_PAIR(1));
+  
+  // Get size of each type of memory normalized to 50 for printing in different colors
+  std::vector<long> memory_data{system.NonCacheBufferMem(), system.BufferMem(), system.CachedMem(), system.SwapMem()};
+  // Loop through the list of different memory types, track position of bars, and assign different colors
+  int color_counter = 1;
+
+  for (long mem :  memory_data) {
+    float mem_usage = mem / system.TotalMemoryUsage();
+    wattron(window, COLOR_PAIR(color_counter));
+
+    // Loop through each set of memory usages, accounting for current position in bar count
+    wprintw(window, ProgressBar(mem_usage))
+    
+    wattroff(window, COLOR_PAIR(color_counter));
+    color_counter++;
+  }
+
+  // wattron(window, COLOR_PAIR(1));
+  // mvwprintw(window, row, 10, "");
+  // wprintw(window, MemoryBar(system, window).c_str());
+  // wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
   mvwprintw(window, ++row, 2,
