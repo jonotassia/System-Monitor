@@ -22,9 +22,7 @@ int Process::Pid() const {
 // Return this process's CPU utilization
 float Process::CpuUtilization() { 
     float hertz = sysconf(_SC_CLK_TCK);
-    float cpu_util1 = (LinuxParser::ActiveJiffies(this->Pid())/hertz) / this->UpTime();
-    float cpu_util2 = (LinuxParser::ActiveJiffies(this->Pid())/hertz) / this->UpTime();
-    return cpu_util2 - cpu_util1; 
+    return (LinuxParser::ActiveJiffies(this->Pid())/hertz) / this->UpTime(); 
 }
 
 // Return the command that generated this process
@@ -34,9 +32,7 @@ string Process::Command() {
 
 // TODO: Return this process's memory utilization
 string Process::Ram() { 
-    long ram1 = LinuxParser::Ram(this->Pid());
-    long ram2 = LinuxParser::Ram(this->Pid());
-    return to_string(ram2 - ram1); 
+    return LinuxParser::Ram(this->Pid()); 
 }
 
 // TODO: Return the user (name) that generated this process
