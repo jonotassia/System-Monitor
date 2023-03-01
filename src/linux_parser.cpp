@@ -282,7 +282,7 @@ int LinuxParser::TotalProcesses() {
   return 0; 
 }
 
-// Reads and returns the number of running processes
+// Read and return the number of running processes
 int LinuxParser::RunningProcesses() { 
   string line;
   string token;
