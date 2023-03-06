@@ -90,5 +90,3 @@ int System::TotalProcesses() {
 long int System::UpTime() { 
     return LinuxParser::UpTime(); 
 }
-
-// Make new functions for other memory utilization

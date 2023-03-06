@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <iterator>
+#include <cmath>
 
 #include "linux_parser.h"
 
@@ -176,7 +177,7 @@ long LinuxParser::UpTime() {
     std::istringstream linestream(line);
     linestream >> uptime;
   }
-  return std::stol(uptime); 
+  return std::lround(std::stol(uptime)); 
 }
 
 // Read and return the number of active jiffies for a PID
