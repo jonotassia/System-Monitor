@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 #include <iterator>
-#include <cmath>
 
 #include "linux_parser.h"
 
@@ -177,7 +176,7 @@ long LinuxParser::UpTime() {
     std::istringstream linestream(line);
     linestream >> uptime;
   }
-  return std::lround(std::stol(uptime)); 
+  return std::stol(uptime); 
 }
 
 // Read and return the number of active jiffies for a PID
@@ -389,7 +388,7 @@ long LinuxParser::UpTime(int pid){
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
   long starttime = std::stol(jiffies[21]);
   long hertz = sysconf(_SC_CLK_TCK);
-  int uptime = UpTime() - starttime / hertz;
+  long uptime = UpTime() - starttime / hertz;
 
   return uptime; 
 }

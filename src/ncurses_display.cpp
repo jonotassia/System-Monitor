@@ -60,7 +60,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int color_counter = 1;
 
   wattron(window, COLOR_PAIR(color_counter));
-  wprintw(window, "0%"); 
+  wprintw(window, "0%%"); 
   wattroff(window, COLOR_PAIR(color_counter));
   
   // Get size of each type of memory normalized to 50 for printing in different colors
@@ -83,7 +83,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
     display = " " + to_string(percent * 100).substr(0, 3);
 
   wattron(window, COLOR_PAIR(4));
-  mvwprintw(window, row, 63, (display + "/100%").c_str());
+  mvwprintw(window, row, 63, (display + "/100%%").c_str());
   wattroff(window, COLOR_PAIR(4));
 
   // Continue to remaining statistics
@@ -92,8 +92,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, ++row, 2,
             ("Running Processes: " + to_string(system.RunningProcesses())).c_str());
   mvwprintw(window, ++row, 2,
-            ("Up Time: " + Format::ElapsedTime(system.UpTime())).c_str());
-  wrefresh(window);
+            ("Up Time: " + Format::ElapsedTime(system.UpTime()) + " ").c_str());
 }
 
 void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
@@ -114,8 +113,6 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   mvwprintw(window, row, command_column, "COMMAND");
   wattroff(window, COLOR_PAIR(2));
   for (int i = 0; i < n; ++i) {
-    //You need to take care of the fact that the cpu utilization has already been multiplied by 100.
-    // Clear the line
     mvwprintw(window, ++row, pid_column, (string(window->_maxx-2, ' ').c_str()));
     
     mvwprintw(window, row, pid_column, to_string(processes[i].Pid()).c_str());
