@@ -110,7 +110,7 @@ unordered_map<string, long> LinuxParser::MemoryData() {
         linestream >> token >> memory_usage;
         // Process string for adding to dictionary
         token.erase(token.end()-1, token.end());
-        memory_data[token] = std::stol(memory_usage);
+        memory_data[token] = (memory_usage != "") ? std::stol(memory_usage) : 0;
       }
     }
 
@@ -176,7 +176,11 @@ long LinuxParser::UpTime() {
     std::istringstream linestream(line);
     linestream >> uptime;
   }
-  return std::stol(uptime); 
+  if (uptime != "") {
+    return std::stol(uptime);
+  } else {
+    return 0;
+  }
 }
 
 // Read and return the number of active jiffies for a PID
@@ -193,10 +197,10 @@ long LinuxParser::ActiveJiffies(int pid) {
     }
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-  long utime = std::stol(jiffies[13]);
-  long stime = std::stol(jiffies[14]);
-  long cutime = std::stol(jiffies[15]);
-  long cstime = std::stol(jiffies[16]);
+  long utime = (jiffies[13])!= "" ? std::stol(jiffies[13]) : 0;
+  long stime = (jiffies[14])!= "" ? std::stol(jiffies[14]) : 0;
+  long cutime = (jiffies[15]) != "" ? std::stol(jiffies[15]) : 0;
+  long cstime = (jiffies[16]) != "" ? std::stol(jiffies[16]) : 0;
   return utime + stime + cutime + cstime; 
 }
 
@@ -220,7 +224,14 @@ long LinuxParser::ActiveCpuJiffies(int cpu_number) {
     }
   }
   // Sum up the relevant jiffies for total active number: user + nice + system + irq + softirq + steal
-  long active_jiffies = std::stol(jiffies[0]) + std::stol(jiffies[1]) + std::stol(jiffies[2]) + std::stol(jiffies[5]) + std::stol(jiffies[6]) + std::stol(jiffies[7]);
+  long active_jiffies = 0;
+  // Create list of indices that should be checked non-null value before stol and assignment
+  vector<int> indices = {0, 1, 2, 5, 6, 7};
+  for (auto i : indices) {
+    if (jiffies[i] != "") {
+      active_jiffies += std::stol(jiffies[i]);
+    }
+  }
   return active_jiffies; 
 }
 
@@ -244,7 +255,9 @@ long LinuxParser::IdleJiffies(int cpu_number) {
     }
   }
   // Sum up the relevant jiffies for total idle number: idle + iowait
-  long idle_jiffies = std::stol(jiffies[3]) + std::stol(jiffies[4]);
+  long idle = (jiffies[3] != "") ? std::stol(jiffies[3]) else 0;
+  long iowait = (jiffies[4] != "") ? std::stol(jiffies[4]) else 0;
+  long idle_jiffies =  idle + iowait;
   return idle_jiffies;  
 }
 
@@ -326,11 +339,12 @@ string LinuxParser::Ram(int pid) {
 
       if (token == "VmSize:") {
           linestream >> ram;
+          ram = (ram != "") ? std::stol(ram)/1000 : 0;
           break;
       }
     }
   }
-  return std::to_string(std::stol(ram)/1000); 
+  return std::to_string(ram);
 }
 
 // Reads and returns the User ID for this process
@@ -386,7 +400,7 @@ long LinuxParser::UpTime(int pid){
     }
   }
   // Calculate active jiffies based on: https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-  long starttime = std::stol(jiffies[21]);
+  long starttime = (jiffies[21] != "") ? std::stol(jiffies[21]) : 0;
   long hertz = sysconf(_SC_CLK_TCK);
   long uptime = UpTime() - starttime / hertz;
 
