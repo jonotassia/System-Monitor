@@ -255,8 +255,8 @@ long LinuxParser::IdleJiffies(int cpu_number) {
     }
   }
   // Sum up the relevant jiffies for total idle number: idle + iowait
-  long idle = (jiffies[3] != "") ? std::stol(jiffies[3]) else 0;
-  long iowait = (jiffies[4] != "") ? std::stol(jiffies[4]) else 0;
+  long idle = (jiffies[3] != "") ? std::stol(jiffies[3]) : 0;
+  long iowait = (jiffies[4] != "") ? std::stol(jiffies[4]) : 0;
   long idle_jiffies =  idle + iowait;
   return idle_jiffies;  
 }
@@ -339,12 +339,13 @@ string LinuxParser::Ram(int pid) {
 
       if (token == "VmSize:") {
           linestream >> ram;
-          ram = (ram != "") ? std::stol(ram)/1000 : 0;
           break;
       }
     }
   }
-  return std::to_string(ram);
+  long lram = (ram != "") ? std::stol(ram)/1000 : 0;
+
+  return std::to_string(lram);
 }
 
 // Reads and returns the User ID for this process
